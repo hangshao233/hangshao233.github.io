@@ -2999,7 +2999,6 @@ blockquote footer cite:before {
 #page-header {
   position: relative;
   width: 100%;
-  background-color: transparent;
   background-position: center center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
