@@ -3824,14 +3824,6 @@ _:future,
   content: '';
   line-height: 0.42em;
 }
-.layout_post {
-  margin: 0 auto;
-  padding: 2rem 15px;
-  max-width: 1000px;
-  opacity: 0.9;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
-  filter: alpha(opacity=90);
-}
 #post img {
   display: block;
 }
