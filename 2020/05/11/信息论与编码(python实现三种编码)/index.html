@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>信息论与编码(python实现三种编码) | HangShao&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="香农编码，费诺编码，赫夫曼编码（python实现） 开始参考了网上其他人的代码，但后来都发现要么代码有错误，要么输出结果不符合自己的预期，于是就重新实现了一下，代码仍存在一些小问题，但是能够满足作业要求，重要的是看懂思路，然后按照自己的想法去实现 代码存在的问题： 1. 香农编码和费诺编码起始的符号及其概率都已给出并且做了初步处理，有想法的可以改成用户自定义输入 2. 费诺编码的实现借助了字典和递">
+<meta property="og:type" content="article">
+<meta property="og:title" content="信息论与编码(python实现三种编码)">
+<meta property="og:url" content="https://gitee.com/hangshao233/hangshao233.git/2020/05/11/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81(python%E5%AE%9E%E7%8E%B0%E4%B8%89%E7%A7%8D%E7%BC%96%E7%A0%81)/index.html">
+<meta property="og:site_name" content="HangShao&#39;s Blog">
+<meta property="og:description" content="香农编码，费诺编码，赫夫曼编码（python实现） 开始参考了网上其他人的代码，但后来都发现要么代码有错误，要么输出结果不符合自己的预期，于是就重新实现了一下，代码仍存在一些小问题，但是能够满足作业要求，重要的是看懂思路，然后按照自己的想法去实现 代码存在的问题： 1. 香农编码和费诺编码起始的符号及其概率都已给出并且做了初步处理，有想法的可以改成用户自定义输入 2. 费诺编码的实现借助了字典和递">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200515132207793.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200515131011244.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20200515132315261.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2020051513283260.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70">
+<meta property="article:published_time" content="2020-05-11T12:06:20.000Z">
+<meta property="article:modified_time" content="2020-10-23T09:39:15.030Z">
+<meta property="article:author" content="HangShao">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="信息论与编码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20200515132207793.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70">
+  
+    <link rel="alternate" href="/atom.xml" title="HangShao&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">HangShao&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://gitee.com/hangshao233/hangshao233.git"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-信息论与编码(python实现三种编码)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/11/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81(python%E5%AE%9E%E7%8E%B0%E4%B8%89%E7%A7%8D%E7%BC%96%E7%A0%81)/" class="article-date">
+  <time datetime="2020-05-11T12:06:20.000Z" itemprop="datePublished">2020-05-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Python/">Python</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      信息论与编码(python实现三种编码)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>香农编码，费诺编码，赫夫曼编码（python实现）</strong></p>
+<p>开始参考了网上其他人的代码，但后来都发现要么代码有错误，要么输出结果不符合自己的预期，于是就重新实现了一下，代码仍存在一些小问题，但是能够满足作业要求，重要的是看懂思路，然后按照自己的想法去实现</p>
+<p><strong>代码存在的问题：</strong></p>
+<pre><code>1. 香农编码和费诺编码起始的符号及其概率都已给出并且做了初步处理，有想法的可以改成用户自定义输入
+2. 费诺编码的实现借助了字典和递归，但是如果初始输入的概率集中存在相同的key(也就是概率集中存在相同概率)，那么字典update()方法的覆盖特性会使两个相同概率对应的码字合并(因为事情比较多，就没有改代码，有带佬知道怎么解决的话求帮助)
+3. 赫夫曼编码借鉴了别人的代码，初始数据是用户自定义输入的</code></pre>
+<h2 id="香农编码"><a href="#香农编码" class="headerlink" title="香农编码"></a>香农编码</h2><p><strong>Code:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line">p = [<span class="number">0.4</span>, <span class="number">0.3</span>, <span class="number">0.2</span>, <span class="number">0.1</span>]        <span class="comment"># 信源符号概率递减排列</span></span><br><span class="line">p_next = [<span class="number">0</span>, <span class="number">0.4</span>, <span class="number">0.7</span>, <span class="number">0.9</span>]     <span class="comment"># 概率累加和</span></span><br><span class="line">k = []          <span class="comment"># 对应码长</span></span><br><span class="line">length_k = <span class="number">0</span>    <span class="comment"># 平均码长</span></span><br><span class="line">H = <span class="number">0</span>           <span class="comment"># 信源熵</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">code_length</span>():</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        k.append(int(math.log(p[i], <span class="number">2</span>) * (<span class="number">-1</span>) + <span class="number">0.99</span>))</span><br><span class="line">    print(<span class="string">&#x27;码长：&#123;&#125;&#x27;</span>.format(k))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">average_length</span>():</span></span><br><span class="line">    <span class="keyword">global</span>  length_k</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        length_k += k[i] * p[i]</span><br><span class="line">    <span class="comment"># print(round(length_k, 1))</span></span><br><span class="line">    print(<span class="string">&quot;平均码长为：&#123;:.3&#125;(bit/sign)&quot;</span>.format(length_k))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将十进制小数转为二进制小数</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">int_to_bin</span>(<span class="params">px</span>):</span></span><br><span class="line">    b = []</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        px *= <span class="number">2</span></span><br><span class="line">        b.append(<span class="number">1</span> <span class="keyword">if</span> px&gt;=<span class="number">1</span> <span class="keyword">else</span> <span class="number">0</span>)</span><br><span class="line">        px -= int(px)</span><br><span class="line">        <span class="keyword">if</span> px == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">                <span class="keyword">if</span> len(b) != k[i]:</span><br><span class="line">                    b.append(<span class="string">&#x27;0&#x27;</span>*(k[i]-len(b)))</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> b</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">codeword</span>():</span></span><br><span class="line">    code = []  <span class="comment"># 对应码字</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        e = <span class="string">&#x27;&#x27;</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(k[i]):</span><br><span class="line">            e += str(int_to_bin(p_next[i])[j])</span><br><span class="line">        code.append(e)</span><br><span class="line">    print(<span class="string">&#x27;码字：&#123;&#125;&#x27;</span>.format(code))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Hx</span>():</span></span><br><span class="line">    <span class="keyword">global</span> H</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        H += p[i] * math.log(p[i], <span class="number">2</span>) * (<span class="number">-1</span>)</span><br><span class="line">    <span class="comment"># print(round(H, 2))</span></span><br><span class="line">    print(<span class="string">&#x27;信源熵：&#123;:.3&#125;(bit/sign)&#x27;</span>.format(H))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">efficiency</span>():</span></span><br><span class="line">    print(<span class="string">&#x27;编码效率：&#123;:.2%&#125;&#x27;</span>.format(H/length_k))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    print(p)</span><br><span class="line">    code_length()       <span class="comment"># 求对应码长</span></span><br><span class="line">    average_length()    <span class="comment"># 求平均码长</span></span><br><span class="line">    Hx()                <span class="comment"># 求信源熵</span></span><br><span class="line">    codeword()          <span class="comment"># 求码字</span></span><br><span class="line">    efficiency()        <span class="comment"># 求编码效率</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Result:</strong><br><img src= "/img/loading.gif" data-lazy-src="https://img-blog.csdnimg.cn/20200515132207793.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="费诺编码"><a href="#费诺编码" class="headerlink" title="费诺编码"></a>费诺编码</h2><p><strong>Code:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line">p = [<span class="number">0.4</span>, <span class="number">0.3</span>, <span class="number">0.2</span>, <span class="number">0.1</span>]      <span class="comment"># 信源符号概率递减排列</span></span><br><span class="line">k = []          <span class="comment"># 码长</span></span><br><span class="line">length_k = <span class="number">0</span>    <span class="comment"># 平均码长</span></span><br><span class="line">code = &#123;&#125;       <span class="comment"># 符号及其对应的码字集合</span></span><br><span class="line">list_code = []</span><br><span class="line">H = <span class="number">0</span>           <span class="comment"># 信源熵</span></span><br><span class="line"><span class="comment"># 编码空间</span></span><br><span class="line">encode_dictionary = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">code_length</span>():</span></span><br><span class="line">    <span class="keyword">for</span> p <span class="keyword">in</span> list_code:</span><br><span class="line">        k.append(len(code[p]))</span><br><span class="line">    print(<span class="string">&#x27;码长：&#123;&#125;&#x27;</span>.format(k))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">average_length</span>():</span></span><br><span class="line">    <span class="keyword">global</span> length_k</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> p <span class="keyword">in</span> list_code:</span><br><span class="line">        length_k += len(code[p]) * p</span><br><span class="line">    print(<span class="string">&quot;平均码长为：&#123;:.3&#125;比特/符号&quot;</span>.format(length_k))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">codeword</span>(<span class="params">px, encode_dictionary</span>):</span></span><br><span class="line">    <span class="keyword">if</span> len(px) == <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 最佳分组位置</span></span><br><span class="line">    flag = <span class="number">1</span></span><br><span class="line">    find_position = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(px)):</span><br><span class="line">        sum1 = <span class="number">0</span></span><br><span class="line">        sum2 = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i+<span class="number">1</span>):</span><br><span class="line">            sum1 += px[i]</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i+<span class="number">1</span>,len(px)):</span><br><span class="line">            sum2 += px[j]</span><br><span class="line">        difference = abs(sum1 - sum2)</span><br><span class="line">        <span class="keyword">if</span> difference &lt; flag:</span><br><span class="line">            flag = difference</span><br><span class="line">            find_position = i+<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 编码</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(px)):</span><br><span class="line">        <span class="keyword">if</span> i &lt; find_position:</span><br><span class="line">            element = &#123;px[i] : encode_dictionary[px[i]] + <span class="string">&#x27;0&#x27;</span>&#125;</span><br><span class="line">            encode_dictionary.update(element)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            element = &#123;px[i] : encode_dictionary[px[i]] + <span class="string">&#x27;1&#x27;</span>&#125;</span><br><span class="line">            encode_dictionary.update(element)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 编码分组</span></span><br><span class="line">    leftgroup = []</span><br><span class="line">    rightgroup = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(find_position):</span><br><span class="line">        leftgroup.append(px[i])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(find_position, len(px)):</span><br><span class="line">        rightgroup.append((px[i]))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 递归编码</span></span><br><span class="line">    codeword(leftgroup, encode_dictionary)</span><br><span class="line">    codeword(rightgroup, encode_dictionary)</span><br><span class="line">    <span class="comment"># 返回编码空间</span></span><br><span class="line">    <span class="keyword">return</span> encode_dictionary</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Hx</span>():</span></span><br><span class="line">    <span class="keyword">global</span> H</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        H += p[i] * math.log(p[i], <span class="number">2</span>) * (<span class="number">-1</span>)</span><br><span class="line">    <span class="comment"># print(round(H, 2))</span></span><br><span class="line">    print(<span class="string">&#x27;信源熵：&#123;:.3&#125;(bit/sign)&#x27;</span>.format(H))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">efficiency</span>():</span></span><br><span class="line">    print(<span class="string">&#x27;编码效率：&#123;:.2%&#125;&#x27;</span>.format(H/length_k))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="comment"># 初始化编码空间</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(p)):</span><br><span class="line">        element = &#123;p[i]: <span class="string">&quot;&quot;</span>&#125;</span><br><span class="line">        encode_dictionary.update(element)</span><br><span class="line"></span><br><span class="line">    print(p)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 求码字</span></span><br><span class="line">    code = codeword(p, encode_dictionary)</span><br><span class="line">    list_code = list(code)</span><br><span class="line">    code_length()  <span class="comment"># 求码长</span></span><br><span class="line">    average_length()  <span class="comment"># 平均码长</span></span><br><span class="line">    Hx()  <span class="comment"># 求信源熵</span></span><br><span class="line">    <span class="keyword">for</span> p <span class="keyword">in</span> list_code:</span><br><span class="line">        print(<span class="string">&#x27;对应码字：&#123;&#125;&#x27;</span>.format(code[p]))</span><br><span class="line"></span><br><span class="line">    efficiency()        <span class="comment"># 求编码效率</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Result:</strong><br><img src= "/img/loading.gif" data-lazy-src="https://img-blog.csdnimg.cn/20200515131011244.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="赫夫曼编码"><a href="#赫夫曼编码" class="headerlink" title="赫夫曼编码"></a>赫夫曼编码</h2><p><strong>Code:</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line"><span class="comment"># 码长</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">code_length</span>():</span></span><br><span class="line">    list_code = list(code)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(list_code)):</span><br><span class="line">        k.append(len(code[s[i]]))</span><br><span class="line">    print(<span class="string">&#x27;码长：&#123;&#125;&#x27;</span>.format(k))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Hx</span>():</span></span><br><span class="line">    <span class="keyword">global</span> H</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">        H += w[i] * math.log(w[i], <span class="number">2</span>) * (<span class="number">-1</span>)</span><br><span class="line">    <span class="comment"># print(round(H, 2))</span></span><br><span class="line">    print(<span class="string">&#x27;信源熵：&#123;:.3&#125;(bit/sign)&#x27;</span>.format(H))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 平均码长</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">huffmanCode</span>(<span class="params">root, tree, rootCode=<span class="string">&#x27;&#x27;</span>, codeDict=&#123;&#125;, depth=<span class="number">1</span>, res=<span class="number">0</span></span>):</span></span><br><span class="line">    <span class="comment"># 对左子树进行处理：如果是叶子节点，就打印编码；否则递归</span></span><br><span class="line">    <span class="keyword">if</span> len(root[<span class="string">&#x27;left&#x27;</span>][<span class="number">0</span>]) == <span class="number">1</span>:</span><br><span class="line">        codeDict[root[<span class="string">&#x27;left&#x27;</span>][<span class="number">0</span>]] = <span class="string">&#x27;0&#x27;</span> + rootCode</span><br><span class="line">        res += (len(rootCode) + <span class="number">1</span>) * root[<span class="string">&#x27;left&#x27;</span>][<span class="number">1</span>]  <span class="comment"># 计算平均位数</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        codeDict, res = huffmanCode(tree[root[<span class="string">&#x27;left&#x27;</span>][<span class="number">0</span>]], tree, <span class="string">&#x27;0&#x27;</span> + rootCode, codeDict, depth + <span class="number">1</span>, res)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 对右子树进行处理：如果是叶子节点，就打印编码；否则递归</span></span><br><span class="line">    <span class="keyword">if</span> len(root[<span class="string">&#x27;right&#x27;</span>][<span class="number">0</span>]) == <span class="number">1</span>:</span><br><span class="line">        codeDict[root[<span class="string">&#x27;right&#x27;</span>][<span class="number">0</span>]] = <span class="string">&#x27;1&#x27;</span> + rootCode</span><br><span class="line">        res += (len(rootCode) + <span class="number">1</span>) * root[<span class="string">&#x27;right&#x27;</span>][<span class="number">1</span>]  <span class="comment"># 计算平均位数</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        codeDict, res = huffmanCode(tree[root[<span class="string">&#x27;right&#x27;</span>][<span class="number">0</span>]], tree, <span class="string">&#x27;1&#x27;</span> + rootCode, codeDict, depth + <span class="number">1</span>, res)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> codeDict, res</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">s = eval(input(<span class="string">&#x27;若干字符：&#x27;</span>))</span><br><span class="line">w = eval(input(<span class="string">&#x27;对应概率：&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 合并成一个字典</span></span><br><span class="line">arr = [[s[i], w[i]] <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s))]</span><br><span class="line"></span><br><span class="line">tree = &#123;&#125;</span><br><span class="line"><span class="keyword">while</span> len(arr) &gt; <span class="number">1</span>:</span><br><span class="line">    <span class="comment"># 1 根据权重排序</span></span><br><span class="line">    arr.sort(key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2 选出最小的两个节点，分别作为左子树，右子树</span></span><br><span class="line">    l = arr[<span class="number">0</span>]  <span class="comment"># 较小的作为左子树</span></span><br><span class="line">    r = arr[<span class="number">1</span>]  <span class="comment"># 较大者作为右子树</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> len(arr) &gt; <span class="number">2</span>:</span><br><span class="line">        tree[l[<span class="number">0</span>] + r[<span class="number">0</span>]] = &#123;<span class="string">&#x27;left&#x27;</span>: l, <span class="string">&#x27;right&#x27;</span>: r&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 3 用新节点置换这两个节点</span></span><br><span class="line">        arr = arr[<span class="number">2</span>:]</span><br><span class="line">        arr.append([l[<span class="number">0</span>] + r[<span class="number">0</span>], l[<span class="number">1</span>] + r[<span class="number">1</span>]])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        tree[<span class="string">&#x27;root&#x27;</span>] = &#123;<span class="string">&#x27;left&#x27;</span>: l, <span class="string">&#x27;right&#x27;</span>: r&#125;</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">code, res = huffmanCode(tree[<span class="string">&#x27;root&#x27;</span>], tree)</span><br><span class="line"><span class="comment"># 码长k</span></span><br><span class="line">k = []</span><br><span class="line">H = <span class="number">0</span></span><br><span class="line">code_length()</span><br><span class="line">print(<span class="string">&#x27;平均码长：&#123;:.3&#125;&#x27;</span>.format(res/sum(w)))</span><br><span class="line">Hx()</span><br><span class="line"><span class="comment"># 码字m</span></span><br><span class="line">m = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(s)):</span><br><span class="line">    x = str(code[s[i]].replace(<span class="string">&#x27;1&#x27;</span>,<span class="string">&#x27;2&#x27;</span>))</span><br><span class="line">    y = x.replace(<span class="string">&#x27;0&#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    z = y.replace(<span class="string">&#x27;2&#x27;</span>,<span class="string">&#x27;0&#x27;</span>)</span><br><span class="line">    n = list(z)</span><br><span class="line">    n.reverse()</span><br><span class="line">    m.append(<span class="string">&#x27;&#x27;</span>.join(n))</span><br><span class="line">print(<span class="string">&#x27;码字：&#123;&#125;&#x27;</span>.format(m))</span><br><span class="line">print(<span class="string">&#x27;编码效率：&#123;:.2%&#125;&#x27;</span>.format(H / round(res/sum(w),<span class="number">3</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># &#x27;a&#x27;,&#x27;b&#x27;,&#x27;c&#x27;,&#x27;d&#x27;</span></span><br><span class="line"><span class="comment"># 0.4,0.3,0.2,0.1</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Result:</strong><br><img src= "/img/loading.gif" data-lazy-src="https://img-blog.csdnimg.cn/20200515132315261.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>由上可得，相同的数据，使用不同的编码，效率也不相同<br>编码效率：赫夫曼编码 &gt;= 费诺编码 &gt; 香农编码</p>
+<p>上面费诺编码和赫夫曼编码的编码效率不都是97.18%吗？<br>为什么赫夫曼编码的编码效率不是应该等于费诺编码的编码效率吗？<br>我觉得这个应该是特殊情况<br><img src= "/img/loading.gif" data-lazy-src="https://img-blog.csdnimg.cn/2020051513283260.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTI1NDIwOA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://gitee.com/hangshao233/hangshao233.git/2020/05/11/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81(python%E5%AE%9E%E7%8E%B0%E4%B8%89%E7%A7%8D%E7%BC%96%E7%A0%81)/" data-id="ckh8yej6r000hrgu86ta99bls" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81/" rel="tag">信息论与编码</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/09/11/Flask%E9%A1%B9%E7%9B%AE(SQLAlchemy%E6%8F%92%E4%BB%B6%E7%9A%84%E4%BD%BF%E7%94%A8)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Flask项目(SQLAlchemy插件的使用)
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mood/">Mood</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/PHP/">PHP</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Web/">Web</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/CTF/" rel="tag">CTF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Flask/" rel="tag">Flask</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gitee/" rel="tag">Gitee</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Github/" rel="tag">Github</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Hexo/" rel="tag">Hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mood/" rel="tag">Mood</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PHP/" rel="tag">PHP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSRF/" rel="tag">SSRF</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WP/" rel="tag">WP</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/butterfly/" rel="tag">butterfly</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/upload/" rel="tag">upload</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81/" rel="tag">信息论与编码</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">反序列化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" rel="tag">文件包含</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/CTF/" style="font-size: 16.67px;">CTF</a> <a href="/tags/Flask/" style="font-size: 10px;">Flask</a> <a href="/tags/Gitee/" style="font-size: 10px;">Gitee</a> <a href="/tags/Github/" style="font-size: 10px;">Github</a> <a href="/tags/Hexo/" style="font-size: 10px;">Hexo</a> <a href="/tags/Mood/" style="font-size: 10px;">Mood</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/PHP/" style="font-size: 16.67px;">PHP</a> <a href="/tags/Python/" style="font-size: 13.33px;">Python</a> <a href="/tags/SSRF/" style="font-size: 13.33px;">SSRF</a> <a href="/tags/WP/" style="font-size: 16.67px;">WP</a> <a href="/tags/Web/" style="font-size: 20px;">Web</a> <a href="/tags/butterfly/" style="font-size: 10px;">butterfly</a> <a href="/tags/upload/" style="font-size: 10px;">upload</a> <a href="/tags/%E4%BF%A1%E6%81%AF%E8%AE%BA%E4%B8%8E%E7%BC%96%E7%A0%81/" style="font-size: 10px;">信息论与编码</a> <a href="/tags/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" style="font-size: 10px;">反序列化</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/" style="font-size: 10px;">文件包含</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/11/07/%E6%9D%A5%E8%B0%88%E8%B0%88%E6%88%91%E5%AF%B9%E5%AD%A6%E4%B9%A0%E8%8B%B1%E8%AF%AD%E7%9A%84%E7%9C%8B%E6%B3%95/">来谈谈我对学习英语的看法</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/05/CTFHub-SSRF%E9%83%A8%E5%88%86WP/">CTFHub(SSRF部分WP)</a>
+          </li>
+        
+          <li>
+            <a href="/2020/11/01/PHP%E9%81%8D%E5%8E%86%E6%95%B0%E7%BB%84%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E6%B3%95/">PHP遍历数组的几种方法</a>
+          </li>
+        
+          <li>
+            <a href="/2020/10/24/SSRF%E6%B5%85%E6%9E%90/">SSRF浅析</a>
+          </li>
+        
+          <li>
+            <a href="/2020/10/21/CTFHub%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">CTFHub文件包含</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 HangShao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
