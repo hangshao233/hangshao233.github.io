@@ -1,0 +1,27 @@
+/* 标签自定义颜色 */
+/* 分类 */
+.card-folder-animation {
+  color: rgba(107, 72, 255, 1);
+}
+
+/* 标签 */
+.card-tags-animation {
+  color: rgba(13, 63, 103, 1);
+}
+
+/* 头像点击特效 */
+.card-info-avatar:hover {
+  background: url(https://gitee.com/lovelijunyi/images/raw/master/20200530181856.gif);
+}
+
+/* 滚动条优化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+
+/* 主页半透明度 */
+.layout_page {
+  opacity: 0.9;
+}
